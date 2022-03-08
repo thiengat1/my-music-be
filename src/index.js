@@ -2,7 +2,7 @@
  * @Description:
  * @Author: Lewis
  * @Date: 2021-12-11 22:37:23
- * @LastEditTime: 2022-02-06 23:10:49
+ * @LastEditTime: 2022-03-08 22:48:42
  * @LastEditors: Lewis
  */
 const path = require("path");
@@ -10,11 +10,16 @@ const express = require("express");
 const morgan = require("morgan");
 const app = express();
 const port = 3000;
+const http = require("http");
+require('dotenv').config();
+
+const { getOnComment } = require("./app/middleware/socket");
+
 const cors = require("cors");
 const corsOptions = {
   origin: "*",
   credentials: true, //access-control-allow-credentials:true
-  optionSuccessStatus: 200,
+  optionSuccessStatus: 200
 };
 
 const route = require("./routes");
@@ -32,14 +37,24 @@ app.use(express.static(path.join(__dirname, "./public")));
 //routes init
 route(app);
 
-//cookies
-app.get('set-cookies',(req,res)=>{
 
-})
-app.get('set-cookies',(req,res)=>{
-  
-})
+const server = http.createServer(app);
 
-app.listen(port, () => {
+let io = require("socket.io")(server, {
+  cors: {
+    origin: "*",
+    methods: ["GET", "POST"]
+  }
+});
+
+io.on("connection", (socket) => {
+  console.log("New client connected");
+  getOnComment(socket);
+  socket.on("disconnect", () => {
+    console.log("Client disconnected");
+  });
+});
+
+server.listen(port, () => {
   console.log(`Example app listening at http://localhost:${port}`);
 });

@@ -2,7 +2,7 @@
  * @Description:
  * @Author: Lewis
  * @Date: 2022-01-26 23:29:13
- * @LastEditTime: 2022-02-06 23:39:21
+ * @LastEditTime: 2022-03-08 22:47:50
  * @LastEditors: Lewis
  */
 const User = require("../models/User");
@@ -23,8 +23,8 @@ const handleError = (err) => {
 };
 const maxAge = 4 * 60 * 60;
 const createToken = (id) => {
-  return jwt.sign({ id }, "lewis secret string", {
-    expiresIn: maxAge,
+  return jwt.sign({ id }, process.env.TOKEN_STRING, {
+    expiresIn: maxAge
   });
 };
 
@@ -37,25 +37,35 @@ class AuthController {
     try {
       const user = await User.create({ username, password });
       const token = createToken(user._id);
-      console.log("token", token);
       res.status(200).json(user);
     } catch (err) {
-      handleError(err);
-      res.status(400).json({ err: "create user error" });
+      const errors = handleError(err);
+      res.status(400).json(errors);
     }
   }
+  //[POST] /user/login
   async login(req, res, next) {
     const { username, password } = req.body;
-    console.log("req.body", req.body);
     try {
-      const user = await User.create({ username, password });
+      const user = await User.login(username, password);
       const token = createToken(user._id);
-      console.log("token", token);
-      res.status(200).json(token);
+      res.status(200).json({ token, username: user.username });
     } catch (err) {
-      handleError(err);
-      res.status(400).json({ err: "create user error" });
+      console.log("err", err);
+      next(err)
+      //res.status(400).json({ code: 400, message: err.toString() });
     }
+  }
+  //[POST] /user/logout
+  logout(req, res, next) {
+    const authHeader = req.headers["authorization"];
+    jwt.sign(authHeader, "", { expiresIn: 1 }, (logout, err) => {
+      if (logout) {
+        res.send({ msg: "You have been Logged Out" });
+      } else {
+        res.send({ msg: "Error" });
+      }
+    });
   }
 }
 
