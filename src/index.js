@@ -2,12 +2,12 @@
  * @Description:
  * @Author: Lewis
  * @Date: 2021-12-11 22:37:23
- * @LastEditTime: 2022-03-09 15:10:17
+ * @LastEditTime: 2022-03-09 15:15:05
  * @LastEditors: Lewis
  */
 const path = require("path");
 const express = require("express");
-const morgan = require("morgan");
+//const morgan = require("morgan");
 const app = express();
 const port = process.env.PORT||8080;
 const http = require("http");
@@ -31,7 +31,7 @@ db.connect();
 app.use(express.json());
 app.use(express.urlencoded());
 app.use(cors(corsOptions)); // Use this after the variable declaration
-app.use(morgan("combined"));
+//app.use(morgan("combined"));
 app.use(express.static(path.join(__dirname, "./public")));
 
 //routes init
