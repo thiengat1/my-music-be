@@ -2,14 +2,14 @@
  * @Description:
  * @Author: Lewis
  * @Date: 2021-12-11 22:37:23
- * @LastEditTime: 2022-03-08 22:48:42
+ * @LastEditTime: 2022-03-09 14:44:54
  * @LastEditors: Lewis
  */
 const path = require("path");
 const express = require("express");
 const morgan = require("morgan");
 const app = express();
-const port = 3000;
+const port = process.env.PORT||80;
 const http = require("http");
 require('dotenv').config();
 
